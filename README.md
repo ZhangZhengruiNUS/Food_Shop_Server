@@ -1,7 +1,8 @@
 # Development instructions
 
 >**Recommended development OS version: Ubuntu 22.04.3 LTS**  
-**For other OS, such as MacOS, some details may be different, please use Google/Chatgpt to solve it**
+**For Windows, using WSL is highly recommended.**  
+**For other OS, such as MacOS, some details may be different, please use Google/Chatgpt to solve it**  
 
 ![Backend Development Pattern](img/design_pic2.jpg)
 
