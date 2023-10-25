@@ -149,9 +149,9 @@ Especially, add structured comments before **function** and **struct definition*
 
 ![comments example](img/1697780076090.jpg)
 
-- Write "fmt" log at the beginning and end of the handler function, like this:
+- Write "log" at the beginning and end of the handler function, like this:
 
-![comments example](img/1697780038549.jpg)
+![comments example3](img/1698240249947.png)
 
 ## 3. Use Git to start team development
 
@@ -357,7 +357,7 @@ _**Note: If you want to ensure that the data you need to verify remains unchange
 
 ![sqlc scripts example](img/1697722482517.jpg)
 
-### 3.4 Database Modification
+### 4.3 Database Modification
 
 >In this way, every change to the database structure is recorded in detail and can be easily applied or rolled back.
 
@@ -421,7 +421,7 @@ This will regenerate the affected files under "./db/sqlc"
 
 ![account.sql.go](img/1697375254302.png)
 
-### 3.5 Test
+### 4.4 Test
 
 ## 5. Dockerfile
 
