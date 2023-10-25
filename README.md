@@ -112,7 +112,6 @@ make postgres
 ```
 
 This will trigger the instruction corresponding to "postgres" in "Makefile"
->docker run --name postgres16 --network rpgame-network -e POSTGRES_USER=root -e POSTGRES_PASSWORD=admin123 -p 5432:5432 -d postgres:16-alpine
 
 - Create database
 
@@ -122,8 +121,7 @@ In the terminal, navigate to the project root directory and use the following co
 make createdb
 ```
 
-This will trigger the instruction corresponding to "createdb" in the Makefile:
->docker exec -it postgres16 createdb --username=root --owner=root red_pocket_game
+This will trigger the instruction corresponding to "createdb" in the Makefile
 
 - Create init tables of database
 
@@ -133,10 +131,8 @@ In the terminal, navigate to the project root directory and use the following co
 make migrateup
 ```
 
-This will trigger the instruction corresponding to "createdb" in the Makefile:
->migrate -path db/migration -database "postgresql://root:admin123@localhost:5432/red_pocket_game?sslmode=disable" -verbose up
-
-This command will execute the SQL scripts in the latest **0XXXXX_XXXX.up.sql** file under the Food_Shop_Server/db/migration
+This will trigger the instruction corresponding to "createdb" in the Makefile
+It will execute the SQL scripts in the latest **0XXXXX_XXXX.up.sql** file under the Food_Shop_Server/db/migration
 
 ## 2. Common rules
 
@@ -312,9 +308,9 @@ ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 
 ##### 4.2.3.1 Non-Transactions
 
->Only in the following two cases, you can use this method:
->a. Change(Create/Update/Delete) only one table with only one record
->b. Only read tables
+>Only in the following two cases, you can use this method:  
+a. Change(Create/Update/Delete) a single record in a single table, without the need to verify the data that could be modified by other transactions  
+b. Only read tables
 
 - Write the sqlc scripts in the "db/query/table_name.sql"(follow the syntax of sqlc), like this:
 _(ref: <https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.html>)_
@@ -348,11 +344,13 @@ This will generate the affected files under "./db/sqlc", then you can find the s
 
 ##### 4.2.3.2 Transactions
 
->In the following two cases, but not only the two cases, you can use this method:  
-a. When you want to change(Create/Update/Delete) more than one table  
-b. When you want to change(Create/Update/Delete) one table with more than one record
+>In the following two cases, but not only the two cases, you should use this method:  
+a. You want to change(Create/Update/Delete) more than one table  
+b. You want to change(Create/Update/Delete) one table with more than one record  
+c. You want to change(Create/Update/Delete) a single record in a single table, with the need to verify the data that could be modified by other transactions
 
-- The same way as "Non-Transactions" to write Sqlc sctipts and generate Go functions for a single table
+- The same way as "Non-Transactions" to write Sqlc sctipts and generate Go functions for a single table.
+_**Note: If you want to ensure that the data you need to verify remains unchanged before making the change(Create/Update/Delete), you should use an "Explicit Lock" by adding "... FOR UPDATE" to your SQL query**_
 
 - Use "ExecTx" function in the "db/sqlc/store.go", put the steps in its call back function, like this:
 

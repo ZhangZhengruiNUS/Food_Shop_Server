@@ -1,9 +1,9 @@
 package main
 
 import (
-	db "Red_Pocket_Game_Server/db/sqlc"
-	handler "Red_Pocket_Game_Server/handlers"
-	"Red_Pocket_Game_Server/util"
+	db "Food_Shop_Server/db/sqlc"
+	handler "Food_Shop_Server/handlers"
+	"Food_Shop_Server/util"
 	"database/sql"
 	"fmt"
 	"log"
