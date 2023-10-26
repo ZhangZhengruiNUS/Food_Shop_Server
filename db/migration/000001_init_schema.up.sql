@@ -1,5 +1,6 @@
 CREATE TABLE "products" (
   "product_id" bigserial PRIMARY KEY,
+  "product_name" varchar NOT NULL DEFAULT ' ',
   "shop_owner_id" bigint NOT NULL,
   "pic_path" varchar NOT NULL DEFAULT ' ',
   "describe" varchar NOT NULL DEFAULT ' ',
