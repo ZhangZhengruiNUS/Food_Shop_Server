@@ -563,6 +563,16 @@ By this button, you can not only just see the coverge of the test for the packag
 ![run package tests](img/1698324586917.png)
 _green means you have coverd that path, red means you haven't_
 
+- run tests for all packages
+
+use the following commands:
+
+```bash
+make test
+```
+
+![make test](img/1698325745391.jpg)
+
 ## 5. Dockerfile
 
 ## 6. CICD
