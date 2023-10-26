@@ -42,7 +42,7 @@ func (server *Server) productCountHandler(ctx *gin.Context) {
 	}
 
 	// Return response
-	ctx.JSON(http.StatusOK, productCount)
+	ctx.JSON(http.StatusOK, gin.H{"count": productCount})
 
 	log.Println("================================productCountHandler: End================================")
 }

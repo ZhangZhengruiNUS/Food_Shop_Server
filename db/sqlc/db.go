@@ -24,6 +24,12 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
+	}
+	if q.deleteProductStmt, err = db.PrepareContext(ctx, deleteProduct); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteProduct: %w", err)
+	}
 	if q.getProductCountStmt, err = db.PrepareContext(ctx, getProductCount); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductCount: %w", err)
 	}
@@ -35,6 +41,16 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createProductStmt != nil {
+		if cerr := q.createProductStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createProductStmt: %w", cerr)
+		}
+	}
+	if q.deleteProductStmt != nil {
+		if cerr := q.deleteProductStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteProductStmt: %w", cerr)
+		}
+	}
 	if q.getProductCountStmt != nil {
 		if cerr := q.getProductCountStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getProductCountStmt: %w", cerr)
@@ -84,6 +100,8 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                         DBTX
 	tx                         *sql.Tx
+	createProductStmt          *sql.Stmt
+	deleteProductStmt          *sql.Stmt
 	getProductCountStmt        *sql.Stmt
 	getProductCountByOwnerStmt *sql.Stmt
 }
@@ -92,6 +110,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                         tx,
 		tx:                         tx,
+		createProductStmt:          q.createProductStmt,
+		deleteProductStmt:          q.deleteProductStmt,
 		getProductCountStmt:        q.getProductCountStmt,
 		getProductCountByOwnerStmt: q.getProductCountByOwnerStmt,
 	}

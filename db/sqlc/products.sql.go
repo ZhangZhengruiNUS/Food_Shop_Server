@@ -9,6 +9,58 @@ import (
 	"context"
 )
 
+const createProduct = `-- name: CreateProduct :one
+INSERT INTO products (
+  shop_owner_id,
+  pic_path,
+  describe,
+  price,
+  quantity
+) VALUES (
+  $1, $2, $3, $4, $5
+)
+RETURNING product_id, shop_owner_id, pic_path, describe, price, quantity, create_time
+`
+
+type CreateProductParams struct {
+	ShopOwnerID int64  `json:"shopOwnerId"`
+	PicPath     string `json:"picPath"`
+	Describe    string `json:"describe"`
+	Price       int32  `json:"price"`
+	Quantity    int32  `json:"quantity"`
+}
+
+func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
+	row := q.queryRow(ctx, q.createProductStmt, createProduct,
+		arg.ShopOwnerID,
+		arg.PicPath,
+		arg.Describe,
+		arg.Price,
+		arg.Quantity,
+	)
+	var i Product
+	err := row.Scan(
+		&i.ProductID,
+		&i.ShopOwnerID,
+		&i.PicPath,
+		&i.Describe,
+		&i.Price,
+		&i.Quantity,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
+const deleteProduct = `-- name: DeleteProduct :exec
+DELETE FROM products
+WHERE product_id = $1
+`
+
+func (q *Queries) DeleteProduct(ctx context.Context, productID int64) error {
+	_, err := q.exec(ctx, q.deleteProductStmt, deleteProduct, productID)
+	return err
+}
+
 const getProductCount = `-- name: GetProductCount :one
 SELECT COUNT(*) FROM products
 LIMIT 1

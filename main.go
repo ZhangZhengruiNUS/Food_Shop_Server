@@ -5,7 +5,6 @@ import (
 	handler "Food_Shop_Server/handlers"
 	"Food_Shop_Server/util"
 	"database/sql"
-	"fmt"
 	"log"
 
 	_ "github.com/lib/pq"
@@ -14,13 +13,11 @@ import (
 func main() {
 	config, err := util.LoadConfig(".")
 	if err != nil {
-		fmt.Println("cannot load config")
 		log.Fatal("cannot load config:", err)
 	}
 
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
-		fmt.Println("cannot connect to db")
 		log.Fatal("cannot connect to db:", err)
 	}
 
