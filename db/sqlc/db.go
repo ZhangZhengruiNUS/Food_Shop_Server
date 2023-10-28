@@ -30,6 +30,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getProductCountByOwnerStmt, err = db.PrepareContext(ctx, getProductCountByOwner); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductCountByOwner: %w", err)
 	}
+	if q.getProductListStmt, err = db.PrepareContext(ctx, getProductList); err != nil {
+		return nil, fmt.Errorf("error preparing query GetProductList: %w", err)
+	}
+	if q.getProductListByOwnerStmt, err = db.PrepareContext(ctx, getProductListByOwner); err != nil {
+		return nil, fmt.Errorf("error preparing query GetProductListByOwner: %w", err)
+	}
 	return &q, nil
 }
 
@@ -43,6 +49,16 @@ func (q *Queries) Close() error {
 	if q.getProductCountByOwnerStmt != nil {
 		if cerr := q.getProductCountByOwnerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getProductCountByOwnerStmt: %w", cerr)
+		}
+	}
+	if q.getProductListStmt != nil {
+		if cerr := q.getProductListStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getProductListStmt: %w", cerr)
+		}
+	}
+	if q.getProductListByOwnerStmt != nil {
+		if cerr := q.getProductListByOwnerStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getProductListByOwnerStmt: %w", cerr)
 		}
 	}
 	return err
@@ -86,6 +102,8 @@ type Queries struct {
 	tx                         *sql.Tx
 	getProductCountStmt        *sql.Stmt
 	getProductCountByOwnerStmt *sql.Stmt
+	getProductListStmt         *sql.Stmt
+	getProductListByOwnerStmt  *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -94,5 +112,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                         tx,
 		getProductCountStmt:        q.getProductCountStmt,
 		getProductCountByOwnerStmt: q.getProductCountByOwnerStmt,
+		getProductListStmt:         q.getProductListStmt,
+		getProductListByOwnerStmt:  q.getProductListByOwnerStmt,
 	}
 }

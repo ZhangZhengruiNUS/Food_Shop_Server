@@ -383,13 +383,13 @@ _if the changes are quite significant, you can try to use some database compare 
 - In the terminal, navigate to the project root directory and use the following commands to apply the changes
 
 ```bash
-make migrateup
+sudo make migrateup
 ```
 
 If you want to rollback the changes, use the following commands
 
 ```bash
-make migratedown
+sudo make migratedown
 ```
 
 After you run the command, if there's any mistake in the scripts, the migration will stop and when you run the migraion command again, it will probably show the error message:
@@ -399,7 +399,7 @@ This is because before the migration runs, each database will be set with a dirt
 You can update the change the version of the database into the lastest version forcefully to solve this, use the following commands
 
 ```bash
-make migrateforce version=latest version number
+sudo make migrateforce version=latest version number
 ```
 
 _put the latest version number in the "version" parameter_

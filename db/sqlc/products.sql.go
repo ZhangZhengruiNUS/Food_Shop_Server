@@ -10,8 +10,8 @@ import (
 )
 
 const getProductCount = `-- name: GetProductCount :one
-SELECT COUNT(*) FROM products
-LIMIT 1
+SELECT COUNT(*)
+FROM products LIMIT 1
 `
 
 func (q *Queries) GetProductCount(ctx context.Context) (int64, error) {
@@ -22,7 +22,8 @@ func (q *Queries) GetProductCount(ctx context.Context) (int64, error) {
 }
 
 const getProductCountByOwner = `-- name: GetProductCountByOwner :one
-SELECT COUNT(*) FROM products
+SELECT COUNT(*)
+FROM products
 WHERE shop_owner_id = $1 LIMIT 1
 `
 
@@ -31,4 +32,88 @@ func (q *Queries) GetProductCountByOwner(ctx context.Context, shopOwnerID int64)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const getProductList = `-- name: GetProductList :many
+SELECT product_id, describe, pic_path
+FROM products
+LIMIT $2
+OFFSET (($1 - 1) * $2)
+`
+
+type GetProductListParams struct {
+	Column1 interface{} `json:"column1"`
+	Limit   int32       `json:"limit"`
+}
+
+type GetProductListRow struct {
+	ProductID int64  `json:"productId"`
+	Describe  string `json:"describe"`
+	PicPath   string `json:"picPath"`
+}
+
+func (q *Queries) GetProductList(ctx context.Context, arg GetProductListParams) ([]GetProductListRow, error) {
+	rows, err := q.query(ctx, q.getProductListStmt, getProductList, arg.Column1, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetProductListRow{}
+	for rows.Next() {
+		var i GetProductListRow
+		if err := rows.Scan(&i.ProductID, &i.Describe, &i.PicPath); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductListByOwner = `-- name: GetProductListByOwner :many
+SELECT product_id, describe, pic_path
+FROM products
+WHERE shop_owner_id = $1
+LIMIT $3
+OFFSET (($2 - 1) * $3)
+`
+
+type GetProductListByOwnerParams struct {
+	ShopOwnerID int64       `json:"shopOwnerId"`
+	Column2     interface{} `json:"column2"`
+	Limit       int32       `json:"limit"`
+}
+
+type GetProductListByOwnerRow struct {
+	ProductID int64  `json:"productId"`
+	Describe  string `json:"describe"`
+	PicPath   string `json:"picPath"`
+}
+
+func (q *Queries) GetProductListByOwner(ctx context.Context, arg GetProductListByOwnerParams) ([]GetProductListByOwnerRow, error) {
+	rows, err := q.query(ctx, q.getProductListByOwnerStmt, getProductListByOwner, arg.ShopOwnerID, arg.Column2, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetProductListByOwnerRow{}
+	for rows.Next() {
+		var i GetProductListByOwnerRow
+		if err := rows.Scan(&i.ProductID, &i.Describe, &i.PicPath); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
