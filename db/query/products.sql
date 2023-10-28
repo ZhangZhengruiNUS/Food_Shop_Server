@@ -21,5 +21,5 @@ WHERE shop_owner_id = $1
   AND product_id NOT IN (SELECT *
                          FROM products
                          WHERE shop_owner_id = $1
-                         LIMIT (($2 - 1) * $3vf)
+                         LIMIT (($2 - 1) * $3)
     ) LIMIT $3;
