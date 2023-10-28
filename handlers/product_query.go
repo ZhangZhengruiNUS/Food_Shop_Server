@@ -50,6 +50,9 @@ func (server *Server) productCountHandler(ctx *gin.Context) {
 // merchant get product list
 func (server *Server) productListHandler(ctx *gin.Context) {
 	log.Println("================================merchantProductList: Start================================")
+	
+	var productList list.List
+	var err error
 
 	userIDStr := strings.TrimSpace(ctx.Query("userId"))
 	pageStr := strings.TrimSpace(ctx.Query("page"))
