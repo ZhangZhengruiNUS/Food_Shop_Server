@@ -89,6 +89,18 @@ or
 go install go.uber.org/mock/mockgen@latest
 ```
 
+- Install migrate
+
+change to root (sudo -i)
+_refer:<https://github.com/golang-migrate/migrate/tree/master/cmd/migrate>_
+
+```bash
+curl -L https://packagecloud.io/golang-migrate/migrate/gpgkey | apt-key add -
+echo "deb https://packagecloud.io/golang-migrate/migrate/ubuntu/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/migrate.list
+apt-get update
+apt-get install -y migrate
+```
+
 ### 1.4 Database
 
 Use Docker image to get a Postgresql DB (recommended) or download a Postgresql DB to your local environment
