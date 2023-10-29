@@ -30,7 +30,8 @@ INSERT INTO products(
   pic_path,
   describe,
   price,
-  quantity
+  quantity,
+  create_time
   ) VALUES (
   $1, $2, $3, $4, $5
   )
