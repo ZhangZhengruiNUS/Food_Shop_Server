@@ -1,6 +1,7 @@
 package handler
 
 import (
+	db "Food_Shop_Server/db/sqlc"
 	"log"
 	"net/http"
 	"strconv"
@@ -45,4 +46,65 @@ func (server *Server) productCountHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"count": productCount})
 
 	log.Println("================================productCountHandler: End================================")
+}
+
+/* Product-List handle function */
+func (server *Server) productListHandler(ctx *gin.Context) {
+	log.Println("================================productListHandler: Start================================")
+
+	userIDStr := strings.TrimSpace(ctx.Query("userId"))
+	pageStr := strings.TrimSpace(ctx.Query("page"))
+	pageSizeStr := strings.TrimSpace(ctx.Query("pageSize"))
+	log.Println("userID=", userIDStr)
+	log.Println("page=", pageStr)
+	log.Println("pageSizeStr=", pageSizeStr)
+
+	//We need both of the page and the pageSize
+	if len(pageStr) == 0 || len(pageSizeStr) == 0 {
+		ctx.JSON(http.StatusBadRequest, commonResponse("page or pageSizeStr is empty"))
+		return
+	}
+	pageInt, err := strconv.ParseInt(pageStr, 10, 32)
+	pageSizeInt, err := strconv.ParseInt(pageSizeStr, 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if len(userIDStr) == 0 {
+		// If userId is empty, Get the needed products for customer
+		args := (db.GetProductListParams{
+			Page:     pageInt,
+			Pagesize: int32(pageSizeInt),
+		})
+
+		productList, err := server.store.GetProductList(ctx, args)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusOK, productList)
+	} else {
+		// If userId is not empty, query needed products of this userId for merchant
+		userIDInt, err := strconv.ParseInt(userIDStr, 10, 32)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+		args := (db.GetProductListByOwnerParams{
+			ShopOwnerID: userIDInt,
+			Page:        pageInt,
+			Pagesize:    int32(pageSizeInt),
+		})
+		productList, err := server.store.GetProductListByOwner(ctx, args)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusOK, productList)
+	}
+
+	log.Println("================================productListHandler: End================================")
 }
