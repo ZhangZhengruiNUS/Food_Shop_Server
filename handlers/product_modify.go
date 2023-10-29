@@ -3,25 +3,24 @@ package handler
 import (
 	db "Food_Shop_Server/db/sqlc"
 	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"time"
 )
 
 /* Product-add received data */
 type productAddRequest struct {
-	Shop_owner_id int64   `json:"shop_owner_id"`
-	Pic_path      string  `json:"pic_path"`
-	ProductInfo   string  `json:"productInfo"`
-	Price         float64 `json:"price"`
-	Quantity      int     `json:"quantity"`
-	Create_time   string  `json:"create_time"`
-	Product_ID    int64   `json:"product_ID"`
+	ShopOwnerID int64     `json:"shopOwnerId"`
+	PicPath     string    `json:"picPath"`
+	Describe    string    `json:"describe"`
+	Price       int32     `json:"price"`
+	Quantity    int32     `json:"quantity"`
+	CreateTime  time.Time `json:"createTime"`
 }
 
 type productDeleteRequest struct {
-	Shop_owner_id int64 `json:"shop_owner_id"`
-	Product_ID    int64 `json:"product_ID"`
+	ShopOwnerID int64 `json:"shop_owner_id"`
+	Product_ID  int64 `json:"product_ID"`
 }
 
 /* Product-add Post handle function */
@@ -35,17 +34,17 @@ func (server *Server) productAddHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("Shop_owner_id=", req.Shop_owner_id)
-	fmt.Println("Pic_path=", req.Pic_path)
-	fmt.Println("ProductInfo=", req.ProductInfo)
+	fmt.Println("Shop_owner_id=", req.ShopOwnerID)
+	fmt.Println("Pic_path=", req.PicPath)
+	fmt.Println("ProductInfo=", req.Describe)
 	fmt.Println("Price=", req.Price)
 	fmt.Println("quantity=", req.Quantity)
-	fmt.Println("ExpireTime=", req.Create_time)
+	fmt.Println("ExpireTime=", req.CreateTime)
 	// Start database transaction
 	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 
 		//todo test cases in db.go
-		user, err := server.store.GetUserById(ctx, req.Shop_owner_id)
+		//user, err := server.store.GetUserById(ctx, req.Shop_owner_id)
 
 		// Read item's price
 		//item, err := server.store.GetItem(ctx, req.ItemID)
@@ -56,20 +55,20 @@ func (server *Server) productAddHandler(ctx *gin.Context) {
 
 		// If ID not exists, create it
 		server.store.CreateItem(ctx, db.CreateItemParams{
-			Shop_owner_id: req.Shop_owner_id,
+			ShopOwnerID: req.ShopOwnerID,
 			// ItemID:   req.ItemID,
-			Quantity:    req.Quantity,
-			Price:       req.Price,
-			Create_time: req.Create_time,
-			Pic_path:    req.Pic_path,
-			ProductInfo: req.ProductInfo,
+			Quantity:   req.Quantity,
+			Price:      req.Price,
+			CreateTime: req.CreateTime,
+			PicPath:    req.PicPath,
+			Describe:   req.Describe,
 		})
-		if err != nil {
-			return err
-		}
+		// if err != nil {
+		// 	return err
+		// }
 		fmt.Println("add Created")
 
-		ctx.JSON(http.StatusOK, user)
+		ctx.JSON(http.StatusOK, req.ShopOwnerID)
 		return nil
 	})
 
@@ -107,7 +106,7 @@ func (server *Server) productDeleteHandler(ctx *gin.Context) {
 		// Update user's credit
 
 		// Access control
-		if reqDelete.Shop_owner_id == item.Shop_owner_id {
+		if reqDelete.ShopOwnerID == item.ShopOwnerID {
 
 			// If ID not exists, create it
 			server.store.DeleteItem(ctx, reqDelete.Product_ID)
@@ -117,7 +116,7 @@ func (server *Server) productDeleteHandler(ctx *gin.Context) {
 			fmt.Println("Product Delete")
 
 		}
-		ctx.JSON(http.StatusOK, reqDelete.Shop_owner_id)
+		ctx.JSON(http.StatusOK, reqDelete.ShopOwnerID)
 		return nil
 	})
 
