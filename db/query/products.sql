@@ -20,11 +20,11 @@ WHERE shop_owner_id = $1
 LIMIT $3
 OFFSET (($2 - 1) * $3);
 
--- name: DeleteProduct :exec
+-- name: DeleteItem :exec
 DELETE FROM products
 WHERE product_id =$1;
 
--- name: CreateProduct :one
+-- name: CreateItem :one
 INSERT INTO products(
   shop_owner_id,
   pic_path,
@@ -37,3 +37,6 @@ INSERT INTO products(
   )
   RETURNING *;
 
+-- name: GetItem :one
+SELECT * FROM products
+WHERE product_id = $1 LIMIT 1;
