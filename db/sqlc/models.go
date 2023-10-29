@@ -9,11 +9,11 @@ import (
 )
 
 type Product struct {
-	ProductID   int64     `json:"productId"`
-	ShopOwnerID int64     `json:"shopOwnerId"`
-	PicPath     string    `json:"picPath"`
-	Describe    string    `json:"describe"`
-	Price       int32     `json:"price"`
-	Quantity    int32     `json:"quantity"`
-	CreateTime  time.Time `json:"createTime"`
+	ProductID     int64     `json:"productId"`
+	ShopOwnerName string    `json:"shopOwnerName"`
+	PicPath       string    `json:"picPath"`
+	Describe      string    `json:"describe"`
+	Price         int32     `json:"price"`
+	Quantity      int32     `json:"quantity"`
+	CreateTime    time.Time `json:"createTime"`
 }

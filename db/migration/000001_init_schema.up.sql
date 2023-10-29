@@ -1,6 +1,6 @@
 CREATE TABLE "products" (
   "product_id" bigserial PRIMARY KEY,
-  "shop_owner_id" bigint NOT NULL,
+  "shop_owner_name" varchar NOT NULL,
   "pic_path" varchar NOT NULL DEFAULT ' ',
   "describe" varchar NOT NULL DEFAULT ' ',
   "price" int NOT NULL DEFAULT 0,
@@ -10,4 +10,4 @@ CREATE TABLE "products" (
 
 CREATE INDEX ON "products" ("product_id");
 
-CREATE INDEX ON "products" ("shop_owner_id");
+CREATE INDEX ON "products" ("shop_owner_name");

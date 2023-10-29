@@ -18,24 +18,19 @@ func (server *Server) productCountHandler(ctx *gin.Context) {
 	var err error
 
 	// Read frontend data
-	userIDStr := strings.TrimSpace(ctx.Query("userId"))
-	log.Println("userID=", userIDStr)
+	userName := strings.TrimSpace(ctx.Query("userName"))
+	log.Println("userName=", userName)
 
-	if len(userIDStr) == 0 {
-		// If userId is empty, Get all products
+	if len(userName) == 0 {
+		// If userName is empty, Get all products
 		productCount, err = server.store.GetProductCount(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 	} else {
-		// If userId is not empty, query products of this userId
-		userIDInt, err := strconv.ParseInt(userIDStr, 10, 32)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, errorResponse(err))
-			return
-		}
-		productCount, err = server.store.GetProductCountByOwner(ctx, userIDInt)
+		// If userName is not empty, query products of this userName
+		productCount, err = server.store.GetProductCountByOwner(ctx, userName)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
@@ -52,10 +47,10 @@ func (server *Server) productCountHandler(ctx *gin.Context) {
 func (server *Server) productListHandler(ctx *gin.Context) {
 	log.Println("================================productListHandler: Start================================")
 
-	userIDStr := strings.TrimSpace(ctx.Query("userId"))
+	userName := strings.TrimSpace(ctx.Query("userName"))
 	pageStr := strings.TrimSpace(ctx.Query("page"))
 	pageSizeStr := strings.TrimSpace(ctx.Query("pageSize"))
-	log.Println("userID=", userIDStr)
+	log.Println("userName=", userName)
 	log.Println("page=", pageStr)
 	log.Println("pageSizeStr=", pageSizeStr)
 
@@ -71,10 +66,10 @@ func (server *Server) productListHandler(ctx *gin.Context) {
 		return
 	}
 
-	if len(userIDStr) == 0 {
-		// If userId is empty, Get the needed products for customer
+	if len(userName) == 0 {
+		// If userName is empty, Get the needed products for customer
 		args := (db.GetProductListParams{
-			Page:     pageInt,
+			Page:     int32(pageInt),
 			Pagesize: int32(pageSizeInt),
 		})
 
@@ -84,18 +79,13 @@ func (server *Server) productListHandler(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, productList)
+		ctx.JSON(http.StatusOK, gin.H{"data": productList})
 	} else {
-		// If userId is not empty, query needed products of this userId for merchant
-		userIDInt, err := strconv.ParseInt(userIDStr, 10, 32)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, errorResponse(err))
-			return
-		}
+		// If userName is not empty, query needed products of this userName for merchant
 		args := (db.GetProductListByOwnerParams{
-			ShopOwnerID: userIDInt,
-			Page:        pageInt,
-			Pagesize:    int32(pageSizeInt),
+			ShopOwnerName: userName,
+			Page:          int32(pageInt),
+			Pagesize:      int32(pageSizeInt),
 		})
 		productList, err := server.store.GetProductListByOwner(ctx, args)
 		if err != nil {
@@ -103,7 +93,7 @@ func (server *Server) productListHandler(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, productList)
+		ctx.JSON(http.StatusOK, gin.H{"data": productList})
 	}
 
 	log.Println("================================productListHandler: End================================")

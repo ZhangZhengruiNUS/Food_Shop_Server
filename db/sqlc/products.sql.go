@@ -11,7 +11,7 @@ import (
 
 const createProduct = `-- name: CreateProduct :one
 INSERT INTO products (
-  shop_owner_id,
+  shop_owner_name,
   pic_path,
   describe,
   price,
@@ -19,20 +19,20 @@ INSERT INTO products (
 ) VALUES (
   $1, $2, $3, $4, $5
 )
-RETURNING product_id, shop_owner_id, pic_path, describe, price, quantity, create_time
+RETURNING product_id, shop_owner_name, pic_path, describe, price, quantity, create_time
 `
 
 type CreateProductParams struct {
-	ShopOwnerID int64  `json:"shopOwnerId"`
-	PicPath     string `json:"picPath"`
-	Describe    string `json:"describe"`
-	Price       int32  `json:"price"`
-	Quantity    int32  `json:"quantity"`
+	ShopOwnerName string `json:"shopOwnerName"`
+	PicPath       string `json:"picPath"`
+	Describe      string `json:"describe"`
+	Price         int32  `json:"price"`
+	Quantity      int32  `json:"quantity"`
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
 	row := q.queryRow(ctx, q.createProductStmt, createProduct,
-		arg.ShopOwnerID,
+		arg.ShopOwnerName,
 		arg.PicPath,
 		arg.Describe,
 		arg.Price,
@@ -41,7 +41,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 	var i Product
 	err := row.Scan(
 		&i.ProductID,
-		&i.ShopOwnerID,
+		&i.ShopOwnerName,
 		&i.PicPath,
 		&i.Describe,
 		&i.Price,
@@ -75,11 +75,11 @@ func (q *Queries) GetProductCount(ctx context.Context) (int64, error) {
 
 const getProductCountByOwner = `-- name: GetProductCountByOwner :one
 SELECT COUNT(*) FROM products
-WHERE shop_owner_id = $1 LIMIT 1
+WHERE shop_owner_name = $1 LIMIT 1
 `
 
-func (q *Queries) GetProductCountByOwner(ctx context.Context, shopOwnerID int64) (int64, error) {
-	row := q.queryRow(ctx, q.getProductCountByOwnerStmt, getProductCountByOwner, shopOwnerID)
+func (q *Queries) GetProductCountByOwner(ctx context.Context, shopOwnerName string) (int64, error) {
+	row := q.queryRow(ctx, q.getProductCountByOwnerStmt, getProductCountByOwner, shopOwnerName)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -88,13 +88,13 @@ func (q *Queries) GetProductCountByOwner(ctx context.Context, shopOwnerID int64)
 const getProductList = `-- name: GetProductList :many
 SELECT product_id, describe, pic_path
 FROM products
-LIMIT $2
-OFFSET (($1 - 1) * $2)
+LIMIT $2::int
+OFFSET (($1::int - 1) * $2::int)
 `
 
 type GetProductListParams struct {
-	Page     interface{} `json:"page"`
-	Pagesize int32       `json:"pagesize"`
+	Page     int32 `json:"page"`
+	Pagesize int32 `json:"pagesize"`
 }
 
 type GetProductListRow struct {
@@ -129,15 +129,15 @@ func (q *Queries) GetProductList(ctx context.Context, arg GetProductListParams) 
 const getProductListByOwner = `-- name: GetProductListByOwner :many
 SELECT product_id, describe, pic_path
 FROM products
-WHERE shop_owner_id = $1
-LIMIT $3
-OFFSET (($2 - 1) * $3)
+WHERE shop_owner_name = $1
+LIMIT $3::int
+OFFSET (($2::int - 1) * $3::int)
 `
 
 type GetProductListByOwnerParams struct {
-	ShopOwnerID int64       `json:"shopOwnerId"`
-	Page        interface{} `json:"page"`
-	Pagesize    int32       `json:"pagesize"`
+	ShopOwnerName string `json:"shopOwnerName"`
+	Page          int32  `json:"page"`
+	Pagesize      int32  `json:"pagesize"`
 }
 
 type GetProductListByOwnerRow struct {
@@ -147,7 +147,7 @@ type GetProductListByOwnerRow struct {
 }
 
 func (q *Queries) GetProductListByOwner(ctx context.Context, arg GetProductListByOwnerParams) ([]GetProductListByOwnerRow, error) {
-	rows, err := q.query(ctx, q.getProductListByOwnerStmt, getProductListByOwner, arg.ShopOwnerID, arg.Page, arg.Pagesize)
+	rows, err := q.query(ctx, q.getProductListByOwnerStmt, getProductListByOwner, arg.ShopOwnerName, arg.Page, arg.Pagesize)
 	if err != nil {
 		return nil, err
 	}

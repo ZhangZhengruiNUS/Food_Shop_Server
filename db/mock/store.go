@@ -80,7 +80,7 @@ func (mr *MockStoreMockRecorder) GetProductCount(arg0 interface{}) *gomock.Call 
 }
 
 // GetProductCountByOwner mocks base method.
-func (m *MockStore) GetProductCountByOwner(arg0 context.Context, arg1 int64) (int64, error) {
+func (m *MockStore) GetProductCountByOwner(arg0 context.Context, arg1 string) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProductCountByOwner", arg0, arg1)
 	ret0, _ := ret[0].(int64)
