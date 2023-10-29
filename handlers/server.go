@@ -20,6 +20,7 @@ func NewServer(store db.Store) *Server {
 	router.Use(corsMiddleware())
 
 	router.GET("/product/count", server.productCountHandler)
+	router.GET("/product", server.productListHandler)
 
 	server.router = router
 	return server

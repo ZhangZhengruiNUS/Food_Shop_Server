@@ -13,6 +13,8 @@ type Querier interface {
 	DeleteProduct(ctx context.Context, productID int64) error
 	GetProductCount(ctx context.Context) (int64, error)
 	GetProductCountByOwner(ctx context.Context, shopOwnerID int64) (int64, error)
+	GetProductList(ctx context.Context, arg GetProductListParams) ([]GetProductListRow, error)
+	GetProductListByOwner(ctx context.Context, arg GetProductListByOwnerParams) ([]GetProductListByOwnerRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

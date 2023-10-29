@@ -93,3 +93,33 @@ func (mr *MockStoreMockRecorder) GetProductCountByOwner(arg0, arg1 interface{}) 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductCountByOwner", reflect.TypeOf((*MockStore)(nil).GetProductCountByOwner), arg0, arg1)
 }
+
+// GetProductList mocks base method.
+func (m *MockStore) GetProductList(arg0 context.Context, arg1 db.GetProductListParams) ([]db.GetProductListRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProductList", arg0, arg1)
+	ret0, _ := ret[0].([]db.GetProductListRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProductList indicates an expected call of GetProductList.
+func (mr *MockStoreMockRecorder) GetProductList(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductList", reflect.TypeOf((*MockStore)(nil).GetProductList), arg0, arg1)
+}
+
+// GetProductListByOwner mocks base method.
+func (m *MockStore) GetProductListByOwner(arg0 context.Context, arg1 db.GetProductListByOwnerParams) ([]db.GetProductListByOwnerRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProductListByOwner", arg0, arg1)
+	ret0, _ := ret[0].([]db.GetProductListByOwnerRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProductListByOwner indicates an expected call of GetProductListByOwner.
+func (mr *MockStoreMockRecorder) GetProductListByOwner(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductListByOwner", reflect.TypeOf((*MockStore)(nil).GetProductListByOwner), arg0, arg1)
+}
