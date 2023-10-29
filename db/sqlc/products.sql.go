@@ -7,7 +7,83 @@ package db
 
 import (
 	"context"
+	"time"
 )
+
+const createItem = `-- name: CreateItem :one
+INSERT INTO products(
+  shop_owner_id,
+  pic_path,
+  describe,
+  price,
+  quantity,
+  create_time
+  ) VALUES (
+  $1, $2, $3, $4, $5, $6
+  )
+  RETURNING product_id, shop_owner_id, pic_path, describe, price, quantity, create_time
+`
+
+type CreateItemParams struct {
+	ShopOwnerID int64     `json:"shopOwnerId"`
+	PicPath     string    `json:"picPath"`
+	Describe    string    `json:"describe"`
+	Price       int32     `json:"price"`
+	Quantity    int32     `json:"quantity"`
+	CreateTime  time.Time `json:"createTime"`
+}
+
+func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Product, error) {
+	row := q.queryRow(ctx, q.createItemStmt, createItem,
+		arg.ShopOwnerID,
+		arg.PicPath,
+		arg.Describe,
+		arg.Price,
+		arg.Quantity,
+		arg.CreateTime,
+	)
+	var i Product
+	err := row.Scan(
+		&i.ProductID,
+		&i.ShopOwnerID,
+		&i.PicPath,
+		&i.Describe,
+		&i.Price,
+		&i.Quantity,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
+const deleteItem = `-- name: DeleteItem :exec
+DELETE FROM products
+WHERE product_id =$1
+`
+
+func (q *Queries) DeleteItem(ctx context.Context, productID int64) error {
+	_, err := q.exec(ctx, q.deleteItemStmt, deleteItem, productID)
+	return err
+}
+
+const getItem = `-- name: GetItem :one
+SELECT product_id, shop_owner_id, pic_path, describe, price, quantity, create_time FROM products
+WHERE product_id = $1 LIMIT 1
+`
+
+func (q *Queries) GetItem(ctx context.Context, productID int64) (Product, error) {
+	row := q.queryRow(ctx, q.getItemStmt, getItem, productID)
+	var i Product
+	err := row.Scan(
+		&i.ProductID,
+		&i.ShopOwnerID,
+		&i.PicPath,
+		&i.Describe,
+		&i.Price,
+		&i.Quantity,
+		&i.CreateTime,
+	)
+	return i, err
+}
 
 const getProductCount = `-- name: GetProductCount :one
 SELECT COUNT(*)
