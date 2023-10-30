@@ -1,7 +1,6 @@
 package db
 
 import (
-	"Food_Shop_Server/util"
 	"context"
 	"testing"
 
@@ -10,6 +9,7 @@ import (
 
 func TestProduct(t *testing.T) {
 
+	// Declare variables
 	var product1 Product
 	var product2 Product
 	var product3_1 Product
@@ -20,34 +20,34 @@ func TestProduct(t *testing.T) {
 	var product8 Product
 	var err error
 
-	// Delete test data (when test is over)
+	// Delete test data when testing ends
 	defer func() {
-		deleteTestProduct(product1.ProductID)
-		deleteTestProduct(product2.ProductID)
-		deleteTestProduct(product3_1.ProductID)
-		deleteTestProduct(product4_1.ProductID)
-		deleteTestProduct(product5_1.ProductID)
-		deleteTestProduct(product6_2.ProductID)
-		deleteTestProduct(product7_1.ProductID)
-		deleteTestProduct(product8.ProductID)
+		deleteTestProduct(testQueries, product1.ProductID)
+		deleteTestProduct(testQueries, product2.ProductID)
+		deleteTestProduct(testQueries, product3_1.ProductID)
+		deleteTestProduct(testQueries, product4_1.ProductID)
+		deleteTestProduct(testQueries, product5_1.ProductID)
+		deleteTestProduct(testQueries, product6_2.ProductID)
+		deleteTestProduct(testQueries, product7_1.ProductID)
+		deleteTestProduct(testQueries, product8.ProductID)
 	}()
 
 	// Create some test data in the DB
-	product1, err = insertRandomProduct()
+	product1, err = insertRandomProduct(testQueries)
 	require.NoError(t, err)
-	product2, err = insertRandomProduct()
+	product2, err = insertRandomProduct(testQueries)
 	require.NoError(t, err)
-	product3_1, err = insertRandomProductWithOwner(product1.ShopOwnerName)
+	product3_1, err = insertRandomProductWithOwner(testQueries, product1.ShopOwnerName)
 	require.NoError(t, err)
-	product4_1, err = insertRandomProductWithOwner(product1.ShopOwnerName)
+	product4_1, err = insertRandomProductWithOwner(testQueries, product1.ShopOwnerName)
 	require.NoError(t, err)
-	product5_1, err = insertRandomProductWithOwner(product1.ShopOwnerName)
+	product5_1, err = insertRandomProductWithOwner(testQueries, product1.ShopOwnerName)
 	require.NoError(t, err)
-	product6_2, err = insertRandomProductWithOwner(product2.ShopOwnerName)
+	product6_2, err = insertRandomProductWithOwner(testQueries, product2.ShopOwnerName)
 	require.NoError(t, err)
-	product7_1, err = insertRandomProductWithOwner(product1.ShopOwnerName)
+	product7_1, err = insertRandomProductWithOwner(testQueries, product1.ShopOwnerName)
 	require.NoError(t, err)
-	product8, err = insertRandomProduct()
+	product8, err = insertRandomProduct(testQueries)
 	require.NoError(t, err)
 
 	// Call GetProductCount
@@ -95,51 +95,4 @@ func TestProduct(t *testing.T) {
 		createProductListByOwnerRow(product5_1),
 	},
 	)
-}
-
-// Insert a random product in the DB
-func insertRandomProduct() (Product, error) {
-	return testQueries.CreateProduct(context.Background(), CreateProductParams{
-		ShopOwnerName: util.RandomString(20),
-		PicPath:       util.RandomString(20),
-		Describe:      util.RandomString(20),
-		Price:         util.RandomInt32(1, 1000),
-		Quantity:      util.RandomInt32(1, 1000),
-	})
-}
-
-// Insert a random product with ownerID in the DB
-func insertRandomProductWithOwner(shopOwnerName string) (Product, error) {
-	return testQueries.CreateProduct(context.Background(), CreateProductParams{
-		ShopOwnerName: shopOwnerName,
-		PicPath:       util.RandomString(20),
-		Describe:      util.RandomString(20),
-		Price:         util.RandomInt32(1, 1000),
-		Quantity:      util.RandomInt32(1, 1000),
-	})
-}
-
-// Delete a product in the DB
-func deleteTestProduct(productID int64) error {
-	if productID == 0 {
-		return nil
-	}
-
-	return testQueries.DeleteProduct(context.Background(), productID)
-}
-
-// Create a var of struct createProductListRow
-func createProductListRow(product Product) GetProductListRow {
-	return GetProductListRow{
-		ProductID: product.ProductID,
-		Describe:  product.Describe,
-		PicPath:   product.PicPath}
-}
-
-// Create a var of struct createProductListRow
-func createProductListByOwnerRow(product Product) GetProductListByOwnerRow {
-	return GetProductListByOwnerRow{
-		ProductID: product.ProductID,
-		Describe:  product.Describe,
-		PicPath:   product.PicPath}
 }
