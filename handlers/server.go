@@ -20,7 +20,8 @@ func NewServer(store db.Store) *Server {
 	router.Use(corsMiddleware())
 
 	router.GET("/product/count", server.productCountHandler)
-	router.GET("/product", server.productListHandler)
+	router.GET("/productList", server.productListHandler)
+	router.GET("/product", server.productHandler)
 
 	server.router = router
 	return server
@@ -37,7 +38,7 @@ func errorResponse(err error) gin.H {
 }
 
 // handle common response
-func commonResponse(msg string) gin.H {
+func errorCustomResponse(msg string) gin.H {
 	return gin.H{"error": msg}
 }
 

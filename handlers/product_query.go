@@ -56,7 +56,7 @@ func (server *Server) productListHandler(ctx *gin.Context) {
 
 	//We need both of the page and the pageSize
 	if len(pageStr) == 0 || len(pageSizeStr) == 0 {
-		ctx.JSON(http.StatusBadRequest, commonResponse("page or pageSizeStr is empty"))
+		ctx.JSON(http.StatusBadRequest, errorCustomResponse("page or pageSizeStr is empty"))
 		return
 	}
 	pageInt, err := strconv.ParseInt(pageStr, 10, 32)
@@ -97,4 +97,38 @@ func (server *Server) productListHandler(ctx *gin.Context) {
 	}
 
 	log.Println("================================productListHandler: End================================")
+}
+
+/* Product\ handle function */
+func (server *Server) productHandler(ctx *gin.Context) {
+	log.Println("================================productHandler: Start================================")
+
+	var err error
+
+	// Read frontend data
+	productIDStr := strings.TrimSpace(ctx.Query("productId"))
+	log.Println("productIDStr=", productIDStr)
+
+	if len(productIDStr) == 0 {
+		// If productID is empty, return err
+		ctx.JSON(http.StatusInternalServerError, errorCustomResponse("productId is empty"))
+		return
+	}
+	productIDInt, err := strconv.ParseInt(productIDStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	// If productID is not empty, query this product
+	product, err := server.store.GetProduct(ctx, productIDInt)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	// Return response
+	ctx.JSON(http.StatusOK, product)
+
+	log.Println("================================productHandler: End================================")
 }

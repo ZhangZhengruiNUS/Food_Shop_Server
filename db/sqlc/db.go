@@ -30,6 +30,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteProductStmt, err = db.PrepareContext(ctx, deleteProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteProduct: %w", err)
 	}
+	if q.getProductStmt, err = db.PrepareContext(ctx, getProduct); err != nil {
+		return nil, fmt.Errorf("error preparing query GetProduct: %w", err)
+	}
 	if q.getProductCountStmt, err = db.PrepareContext(ctx, getProductCount); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductCount: %w", err)
 	}
@@ -55,6 +58,11 @@ func (q *Queries) Close() error {
 	if q.deleteProductStmt != nil {
 		if cerr := q.deleteProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteProductStmt: %w", cerr)
+		}
+	}
+	if q.getProductStmt != nil {
+		if cerr := q.getProductStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getProductStmt: %w", cerr)
 		}
 	}
 	if q.getProductCountStmt != nil {
@@ -118,6 +126,7 @@ type Queries struct {
 	tx                         *sql.Tx
 	createProductStmt          *sql.Stmt
 	deleteProductStmt          *sql.Stmt
+	getProductStmt             *sql.Stmt
 	getProductCountStmt        *sql.Stmt
 	getProductCountByOwnerStmt *sql.Stmt
 	getProductListStmt         *sql.Stmt
@@ -130,6 +139,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                         tx,
 		createProductStmt:          q.createProductStmt,
 		deleteProductStmt:          q.deleteProductStmt,
+		getProductStmt:             q.getProductStmt,
 		getProductCountStmt:        q.getProductCountStmt,
 		getProductCountByOwnerStmt: q.getProductCountByOwnerStmt,
 		getProductListStmt:         q.getProductListStmt,

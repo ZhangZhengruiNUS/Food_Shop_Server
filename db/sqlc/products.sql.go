@@ -61,6 +61,28 @@ func (q *Queries) DeleteProduct(ctx context.Context, productID int64) error {
 	return err
 }
 
+const getProduct = `-- name: GetProduct :one
+SELECT product_id, shop_owner_name, pic_path, describe, price, quantity, create_time
+FROM products
+WHERE product_id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetProduct(ctx context.Context, productID int64) (Product, error) {
+	row := q.queryRow(ctx, q.getProductStmt, getProduct, productID)
+	var i Product
+	err := row.Scan(
+		&i.ProductID,
+		&i.ShopOwnerName,
+		&i.PicPath,
+		&i.Describe,
+		&i.Price,
+		&i.Quantity,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
 const getProductCount = `-- name: GetProductCount :one
 SELECT COUNT(*) FROM products
 LIMIT 1

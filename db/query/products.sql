@@ -19,6 +19,12 @@ WHERE shop_owner_name = $1
 LIMIT sqlc.arg(pageSize)::int
 OFFSET ((sqlc.arg(page)::int - 1) * sqlc.arg(pageSize)::int);
 
+-- name: GetProduct :one
+SELECT *
+FROM products
+WHERE product_id = $1
+LIMIT 1;
+
 -- name: DeleteProduct :exec
 DELETE FROM products
 WHERE product_id = $1;

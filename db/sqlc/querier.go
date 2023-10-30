@@ -11,6 +11,7 @@ import (
 type Querier interface {
 	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
 	DeleteProduct(ctx context.Context, productID int64) error
+	GetProduct(ctx context.Context, productID int64) (Product, error)
 	GetProductCount(ctx context.Context) (int64, error)
 	GetProductCountByOwner(ctx context.Context, shopOwnerName string) (int64, error)
 	GetProductList(ctx context.Context, arg GetProductListParams) ([]GetProductListRow, error)
