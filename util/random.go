@@ -37,3 +37,8 @@ func RandomString(n int) string {
 
 	return result.String()
 }
+
+// Generate a random float64 between min and max
+func RandomFloat64(min, max int64) float64 {
+	return float64(min+globalRand.Int63n(max-min+1)) + globalRand.Float64()
+}

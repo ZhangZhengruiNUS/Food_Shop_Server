@@ -35,8 +35,9 @@ INSERT INTO products (
   pic_path,
   describe,
   price,
-  quantity
+  quantity,
+  expire_time
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 )
 RETURNING *;

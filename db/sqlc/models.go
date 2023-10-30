@@ -13,7 +13,8 @@ type Product struct {
 	ShopOwnerName string    `json:"shopOwnerName"`
 	PicPath       string    `json:"picPath"`
 	Describe      string    `json:"describe"`
-	Price         int32     `json:"price"`
+	Price         float64   `json:"price"`
 	Quantity      int32     `json:"quantity"`
+	ExpireTime    time.Time `json:"expireTime"`
 	CreateTime    time.Time `json:"createTime"`
 }
