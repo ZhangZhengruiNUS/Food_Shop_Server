@@ -3,8 +3,9 @@ CREATE TABLE "products" (
   "shop_owner_name" varchar NOT NULL,
   "pic_path" varchar NOT NULL DEFAULT ' ',
   "describe" varchar NOT NULL DEFAULT ' ',
-  "price" int NOT NULL DEFAULT 0,
+  "price" float NOT NULL DEFAULT 0,
   "quantity" int NOT NULL DEFAULT 0,
+  "expire_time" timestamp NOT NULL,
   "create_time" timestamp NOT NULL DEFAULT (now())
 );
 

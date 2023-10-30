@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createProduct = `-- name: CreateProduct :one
@@ -15,19 +16,21 @@ INSERT INTO products (
   pic_path,
   describe,
   price,
-  quantity
+  quantity,
+  expire_time
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 )
-RETURNING product_id, shop_owner_name, pic_path, describe, price, quantity, create_time
+RETURNING product_id, shop_owner_name, pic_path, describe, price, quantity, expire_time, create_time
 `
 
 type CreateProductParams struct {
-	ShopOwnerName string `json:"shopOwnerName"`
-	PicPath       string `json:"picPath"`
-	Describe      string `json:"describe"`
-	Price         int32  `json:"price"`
-	Quantity      int32  `json:"quantity"`
+	ShopOwnerName string    `json:"shopOwnerName"`
+	PicPath       string    `json:"picPath"`
+	Describe      string    `json:"describe"`
+	Price         float64   `json:"price"`
+	Quantity      int32     `json:"quantity"`
+	ExpireTime    time.Time `json:"expireTime"`
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
@@ -37,6 +40,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 		arg.Describe,
 		arg.Price,
 		arg.Quantity,
+		arg.ExpireTime,
 	)
 	var i Product
 	err := row.Scan(
@@ -46,6 +50,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 		&i.Describe,
 		&i.Price,
 		&i.Quantity,
+		&i.ExpireTime,
 		&i.CreateTime,
 	)
 	return i, err
@@ -62,7 +67,7 @@ func (q *Queries) DeleteProduct(ctx context.Context, productID int64) error {
 }
 
 const getProduct = `-- name: GetProduct :one
-SELECT product_id, shop_owner_name, pic_path, describe, price, quantity, create_time
+SELECT product_id, shop_owner_name, pic_path, describe, price, quantity, expire_time, create_time
 FROM products
 WHERE product_id = $1
 LIMIT 1
@@ -78,6 +83,7 @@ func (q *Queries) GetProduct(ctx context.Context, productID int64) (Product, err
 		&i.Describe,
 		&i.Price,
 		&i.Quantity,
+		&i.ExpireTime,
 		&i.CreateTime,
 	)
 	return i, err

@@ -4,6 +4,7 @@ import (
 	"Food_Shop_Server/util"
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -103,8 +104,9 @@ func insertRandomProduct() (Product, error) {
 		ShopOwnerName: util.RandomString(20),
 		PicPath:       util.RandomString(20),
 		Describe:      util.RandomString(20),
-		Price:         util.RandomInt32(1, 1000),
+		Price:         util.RandomFloat64(1, 1000),
 		Quantity:      util.RandomInt32(1, 1000),
+		ExpireTime:    time.Now().Add(24 * time.Hour),
 	})
 }
 
@@ -114,8 +116,9 @@ func insertRandomProductWithOwner(shopOwnerName string) (Product, error) {
 		ShopOwnerName: shopOwnerName,
 		PicPath:       util.RandomString(20),
 		Describe:      util.RandomString(20),
-		Price:         util.RandomInt32(1, 1000),
+		Price:         util.RandomFloat64(1, 1000),
 		Quantity:      util.RandomInt32(1, 1000),
+		ExpireTime:    time.Now().Add(24 * time.Hour),
 	})
 }
 
