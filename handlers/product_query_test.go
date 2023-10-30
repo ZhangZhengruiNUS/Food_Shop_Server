@@ -127,7 +127,7 @@ func TestProductListHandler(t *testing.T) {
 	}{
 		{
 			name:       "ShopOwnerName & page & pageSize is Empty for BadRequest",
-			url:        "/product",
+			url:        "/productList",
 			buildStubs: func(store *mockdb.MockStore) {},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -135,7 +135,7 @@ func TestProductListHandler(t *testing.T) {
 		},
 		{
 			name:       "ShopOwnerName is Empty, page & pageSize is not Empty for BadRequest",
-			url:        "/product?page=2&pageSize=abcd",
+			url:        "/productList?page=2&pageSize=abcd",
 			buildStubs: func(store *mockdb.MockStore) {},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -143,7 +143,7 @@ func TestProductListHandler(t *testing.T) {
 		},
 		{
 			name: "ShopOwnerName is Empty, page & pageSize is not Empty for InternalServerError",
-			url:  "/product?page=2&pageSize=2",
+			url:  "/productList?page=2&pageSize=2",
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetProductList(gomock.Any(), gomock.Any()).
@@ -156,7 +156,7 @@ func TestProductListHandler(t *testing.T) {
 		},
 		{
 			name: "ShopOwnerName is Empty, page & pageSize is not Empty for OK",
-			url:  "/product?page=2&pageSize=2",
+			url:  "/productList?page=2&pageSize=2",
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetProductList(gomock.Any(), gomock.Any()).
@@ -179,7 +179,7 @@ func TestProductListHandler(t *testing.T) {
 		},
 		{
 			name: "ShopOwnerName & page & pageSize is not Empty for InternalServerError",
-			url:  "/product?userName=1&page=2&pageSize=2",
+			url:  "/productList?userName=1&page=2&pageSize=2",
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetProductListByOwner(gomock.Any(), gomock.Any()).
@@ -192,7 +192,7 @@ func TestProductListHandler(t *testing.T) {
 		},
 		{
 			name: "ShopOwnerName & page & pageSize is not Empty for OK",
-			url:  "/product?userName=1&page=2&pageSize=2",
+			url:  "/productList?userName=1&page=2&pageSize=2",
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetProductListByOwner(gomock.Any(), gomock.Any()).
