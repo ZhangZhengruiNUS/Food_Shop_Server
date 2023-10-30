@@ -5,7 +5,7 @@ metadata:
   labels:
     app: food-shop-product
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: food-shop-product
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: food-shop-product
-        image: 029225022811.dkr.ecr.ap-southeast-1.amazonaws.com/red_pocket_game:latest
+        image: 029225022811.dkr.ecr.ap-southeast-1.amazonaws.com/food_shop_product:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
