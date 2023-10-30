@@ -14,12 +14,12 @@ import (
 
 /* Product-add received data */
 type productAddRequest struct {
-	ShopOwnerName string    `json:"userName"`
-	PicPath       string    `json:"picPath"`
-	Describe      string    `json:"describe"`
-	Price         float64   `json:"price"`
-	Quantity      int32     `json:"quantity"`
-	ExpireTime    time.Time `json:"expireTime"`
+	ShopOwnerName string  `json:"userName"`
+	PicPath       string  `json:"picPath"`
+	Describe      string  `json:"describe"`
+	Price         float64 `json:"price"`
+	Quantity      int32   `json:"quantity"`
+	ExpireTime    string  `json:"expireTime"`
 }
 
 /* Product-add Post handle function */
@@ -39,8 +39,18 @@ func (server *Server) productAddHandler(ctx *gin.Context) {
 	log.Println("Price=", req.Price)
 	log.Println("Quantity=", req.Quantity)
 	log.Println("ExpireTime=", req.ExpireTime)
+	if len(req.ShopOwnerName) == 0 || len(req.Describe) == 0 || req.Price == 0 || req.Quantity == 0 || len(req.ExpireTime) == 0 {
+		ctx.JSON(http.StatusBadRequest, errorCustomResponse("Incomplete data"))
+		return
+	}
+	expireTime, err := time.Parse("20060102", req.ExpireTime)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
 	// Start database transaction
-	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
+	err = server.store.ExecTx(ctx, func(q *db.Queries) error {
 		// CreateProduct
 		product, err := server.store.CreateProduct(ctx, db.CreateProductParams{
 			ShopOwnerName: req.ShopOwnerName,
@@ -48,12 +58,12 @@ func (server *Server) productAddHandler(ctx *gin.Context) {
 			Describe:      req.Describe,
 			Price:         req.Price,
 			Quantity:      req.Quantity,
-			ExpireTime:    req.ExpireTime,
+			ExpireTime:    expireTime,
 		})
 		if err != nil {
 			return err
 		}
-		log.Println("add Created")
+		log.Println("Product Created")
 
 		ctx.JSON(http.StatusOK, product)
 		return nil
