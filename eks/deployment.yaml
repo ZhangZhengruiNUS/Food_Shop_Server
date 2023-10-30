@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: food-shop-product-deployment
+  labels:
+    app: food-shop-product
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: food-shop-product
+  template:
+    metadata:
+      labels:
+        app: food-shop-product
+    spec:
+      containers:
+      - name: food-shop-product
+        image: 029225022811.dkr.ecr.ap-southeast-1.amazonaws.com/red_pocket_game:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "100m"
+          limits:
+            cpu: "500m"
