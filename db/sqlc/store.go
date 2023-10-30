@@ -9,6 +9,7 @@ import (
 // Provides all functions to execute DB queries and transactions
 type Store interface {
 	Querier
+	ExecTx(ctx context.Context, fn func(*Queries) error) error
 }
 
 // Provides all functions to execute SQL queries and transactions
