@@ -3,6 +3,7 @@ package db
 import (
 	"Food_Shop_Server/util"
 	"context"
+	"time"
 )
 
 // Insert a random product in the DB
@@ -11,8 +12,9 @@ func insertRandomProduct(testQueries *Queries) (Product, error) {
 		ShopOwnerName: util.RandomString(20),
 		PicPath:       util.RandomString(20),
 		Describe:      util.RandomString(20),
-		Price:         util.RandomInt32(1, 1000),
+		Price:         util.RandomFloat64(1, 1000),
 		Quantity:      util.RandomInt32(1, 1000),
+		ExpireTime:    time.Now().Add(24 * time.Hour),
 	})
 }
 
@@ -22,8 +24,9 @@ func insertRandomProductWithOwner(testQueries *Queries, shopOwnerName string) (P
 		ShopOwnerName: shopOwnerName,
 		PicPath:       util.RandomString(20),
 		Describe:      util.RandomString(20),
-		Price:         util.RandomInt32(1, 1000),
+		Price:         util.RandomFloat64(1, 1000),
 		Quantity:      util.RandomInt32(1, 1000),
+		ExpireTime:    time.Now().Add(24 * time.Hour),
 	})
 }
 
