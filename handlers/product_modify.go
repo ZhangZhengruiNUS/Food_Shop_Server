@@ -78,7 +78,7 @@ func (server *Server) productAddHandler(ctx *gin.Context) {
 	log.Println("================================productAddHandler: End================================")
 }
 
-/* Product-delete delete handle function */
+/* Product-delete Delete handle function */
 func (server *Server) productDeleteHandler(ctx *gin.Context) {
 	log.Println("================================productDeleteHandler: Start================================")
 
@@ -99,11 +99,11 @@ func (server *Server) productDeleteHandler(ctx *gin.Context) {
 	// Start database transaction
 	err = server.store.ExecTx(ctx, func(q *db.Queries) error {
 		// Check product exits
-		_, err := server.store.GetProduct(ctx, productIDInt)
+		_, err := server.store.GetProductForUpdate(ctx, productIDInt)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If product not exists, return err
-				log.Println("User not exists")
+				log.Println("Product not exists")
 				ctx.JSON(http.StatusNotFound, errorCustomResponse("ProductID:["+strconv.FormatInt(productIDInt, 10)+"]not exists!"))
 				return nil
 			} else {
@@ -128,4 +128,62 @@ func (server *Server) productDeleteHandler(ctx *gin.Context) {
 	}
 
 	log.Println("================================productDeleteHandler: End================================")
+}
+
+/* Product-buy received data */
+type productBuyRequest struct {
+	ProductID int64 `json:"productId"`
+	Quantity  int32 `json:"quantity"`
+}
+
+/* Product-buy Post handle function */
+func (server *Server) productBuyHandler(ctx *gin.Context) {
+	log.Println("================================productBuyHandler: Start================================")
+
+	// Read frontend data
+	var req productBuyRequest
+
+	// Read frontend data
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	log.Println("ProductID=", req.ProductID)
+	log.Println("Quantity=", req.Quantity)
+
+	// Start database transaction
+	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
+		// Check product exits
+		_, err := server.store.GetProductForUpdate(ctx, req.ProductID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				// If product not exists, return err
+				log.Println("Product not exists")
+				ctx.JSON(http.StatusNotFound, errorCustomResponse("ProductID:["+strconv.FormatInt(req.ProductID, 10)+"]not exists!"))
+				return nil
+			} else {
+				return err
+			}
+		}
+		// If product exists, update quantity
+		product, err := server.store.UpdateProductQuantity(ctx, db.UpdateProductQuantityParams{
+			Amount:    -req.Quantity,
+			ProductID: req.ProductID,
+		})
+		if err != nil {
+			return err
+		}
+		log.Println("ProductID:[" + strconv.FormatInt(product.ProductID, 10) + "] Quantity:[" + strconv.FormatInt(int64(product.Quantity), 10) + "] Updated")
+
+		ctx.JSON(http.StatusOK, product)
+		return nil
+	})
+
+	// Return response
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	log.Println("================================productBuyHandler: End================================")
 }

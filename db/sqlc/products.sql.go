@@ -113,6 +113,30 @@ func (q *Queries) GetProductCountByOwner(ctx context.Context, shopOwnerName stri
 	return count, err
 }
 
+const getProductForUpdate = `-- name: GetProductForUpdate :one
+SELECT product_id, shop_owner_name, pic_path, describe, price, quantity, expire_time, create_time
+FROM products
+WHERE product_id = $1
+FOR UPDATE
+LIMIT 1
+`
+
+func (q *Queries) GetProductForUpdate(ctx context.Context, productID int64) (Product, error) {
+	row := q.queryRow(ctx, q.getProductForUpdateStmt, getProductForUpdate, productID)
+	var i Product
+	err := row.Scan(
+		&i.ProductID,
+		&i.ShopOwnerName,
+		&i.PicPath,
+		&i.Describe,
+		&i.Price,
+		&i.Quantity,
+		&i.ExpireTime,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
 const getProductList = `-- name: GetProductList :many
 SELECT product_id, describe, pic_path
 FROM products
@@ -195,4 +219,32 @@ func (q *Queries) GetProductListByOwner(ctx context.Context, arg GetProductListB
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateProductQuantity = `-- name: UpdateProductQuantity :one
+UPDATE products
+SET quantity = quantity + $1::int
+WHERE product_id = $2
+RETURNING product_id, shop_owner_name, pic_path, describe, price, quantity, expire_time, create_time
+`
+
+type UpdateProductQuantityParams struct {
+	Amount    int32 `json:"amount"`
+	ProductID int64 `json:"productId"`
+}
+
+func (q *Queries) UpdateProductQuantity(ctx context.Context, arg UpdateProductQuantityParams) (Product, error) {
+	row := q.queryRow(ctx, q.updateProductQuantityStmt, updateProductQuantity, arg.Amount, arg.ProductID)
+	var i Product
+	err := row.Scan(
+		&i.ProductID,
+		&i.ShopOwnerName,
+		&i.PicPath,
+		&i.Describe,
+		&i.Price,
+		&i.Quantity,
+		&i.ExpireTime,
+		&i.CreateTime,
+	)
+	return i, err
 }

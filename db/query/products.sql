@@ -41,3 +41,16 @@ INSERT INTO products (
   $1, $2, $3, $4, $5, $6
 )
 RETURNING *;
+
+-- name: UpdateProductQuantity :one
+UPDATE products
+SET quantity = quantity + sqlc.arg(amount)::int
+WHERE product_id = sqlc.arg(product_id)
+RETURNING *;
+
+-- name: GetProductForUpdate :one
+SELECT *
+FROM products
+WHERE product_id = $1
+FOR UPDATE
+LIMIT 1;

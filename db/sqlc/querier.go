@@ -14,8 +14,10 @@ type Querier interface {
 	GetProduct(ctx context.Context, productID int64) (Product, error)
 	GetProductCount(ctx context.Context) (int64, error)
 	GetProductCountByOwner(ctx context.Context, shopOwnerName string) (int64, error)
+	GetProductForUpdate(ctx context.Context, productID int64) (Product, error)
 	GetProductList(ctx context.Context, arg GetProductListParams) ([]GetProductListRow, error)
 	GetProductListByOwner(ctx context.Context, arg GetProductListByOwnerParams) ([]GetProductListByOwnerRow, error)
+	UpdateProductQuantity(ctx context.Context, arg UpdateProductQuantityParams) (Product, error)
 }
 
 var _ Querier = (*Queries)(nil)
