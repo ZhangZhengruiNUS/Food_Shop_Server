@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/* Product-count handle function */
+/* Product-count GET handle function */
 func (server *Server) productCountHandler(ctx *gin.Context) {
 	log.Println("================================productCountHandler: Start================================")
 
@@ -43,7 +43,7 @@ func (server *Server) productCountHandler(ctx *gin.Context) {
 	log.Println("================================productCountHandler: End================================")
 }
 
-/* Product-List handle function */
+/* Product-List GET handle function */
 func (server *Server) productListHandler(ctx *gin.Context) {
 	log.Println("================================productListHandler: Start================================")
 
@@ -99,7 +99,7 @@ func (server *Server) productListHandler(ctx *gin.Context) {
 	log.Println("================================productListHandler: End================================")
 }
 
-/* Product\ handle function */
+/* Product GET handle function */
 func (server *Server) productHandler(ctx *gin.Context) {
 	log.Println("================================productHandler: Start================================")
 
@@ -111,7 +111,7 @@ func (server *Server) productHandler(ctx *gin.Context) {
 
 	if len(productIDStr) == 0 {
 		// If productID is empty, return err
-		ctx.JSON(http.StatusInternalServerError, errorCustomResponse("productId is empty"))
+		ctx.JSON(http.StatusBadRequest, errorCustomResponse("productId is empty"))
 		return
 	}
 	productIDInt, err := strconv.ParseInt(productIDStr, 10, 64)

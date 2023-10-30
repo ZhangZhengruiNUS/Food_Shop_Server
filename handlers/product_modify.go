@@ -40,11 +40,13 @@ func (server *Server) productAddHandler(ctx *gin.Context) {
 	log.Println("Quantity=", req.Quantity)
 	log.Println("ExpireTime=", req.ExpireTime)
 	if len(req.ShopOwnerName) == 0 || len(req.Describe) == 0 || req.Price == 0 || req.Quantity == 0 || len(req.ExpireTime) == 0 {
+		log.Println("Incomplete data")
 		ctx.JSON(http.StatusBadRequest, errorCustomResponse("Incomplete data"))
 		return
 	}
 	expireTime, err := time.Parse("20060102", req.ExpireTime)
 	if err != nil {
+		log.Println("Convert time wrong")
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}

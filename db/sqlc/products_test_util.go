@@ -13,7 +13,7 @@ func insertRandomProduct(testQueries *Queries) (Product, error) {
 		PicPath:       util.RandomString(20),
 		Describe:      util.RandomString(20),
 		Price:         util.RandomFloat64(1, 1000),
-		Quantity:      util.RandomInt32(1, 1000),
+		Quantity:      util.RandomInt32(10, 1000),
 		ExpireTime:    time.Now().Add(24 * time.Hour),
 	})
 }
@@ -25,17 +25,13 @@ func insertRandomProductWithOwner(testQueries *Queries, shopOwnerName string) (P
 		PicPath:       util.RandomString(20),
 		Describe:      util.RandomString(20),
 		Price:         util.RandomFloat64(1, 1000),
-		Quantity:      util.RandomInt32(1, 1000),
+		Quantity:      util.RandomInt32(10, 1000),
 		ExpireTime:    time.Now().Add(24 * time.Hour),
 	})
 }
 
 // Delete a product in the DB
 func deleteTestProduct(testQueries *Queries, productID int64) error {
-	if productID == 0 {
-		return nil
-	}
-
 	return testQueries.DeleteProduct(context.Background(), productID)
 }
 

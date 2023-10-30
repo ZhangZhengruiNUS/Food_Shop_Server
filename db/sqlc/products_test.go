@@ -95,4 +95,28 @@ func TestProduct(t *testing.T) {
 		createProductListByOwnerRow(product5_1),
 	},
 	)
+
+	// Call GetProduct for OK
+	product1_getTest, err := testQueries.GetProduct(context.Background(), product1.ProductID)
+	// Check GetProduct for OK
+	require.NoError(t, err)
+	require.NotEmpty(t, product1_getTest)
+	require.Equal(t, product1_getTest, product1)
+
+	// Call GetProductForUpdate for OK
+	product2_getTest, err := testQueries.GetProductForUpdate(context.Background(), product2.ProductID)
+	// Check GetProductForUpdate for OK
+	require.NoError(t, err)
+	require.NotEmpty(t, product2_getTest)
+	require.Equal(t, product2_getTest, product2)
+
+	// Call UpdateProductQuantity for OK
+	product1_updateTest, err := testQueries.UpdateProductQuantity(context.Background(), UpdateProductQuantityParams{
+		Amount:    -5,
+		ProductID: product1.ProductID,
+	})
+	// Check UpdateProductQuantity for OK
+	require.NoError(t, err)
+	require.NotEmpty(t, product1_updateTest)
+	require.Equal(t, product1_getTest.Quantity-5, product1_updateTest.Quantity)
 }

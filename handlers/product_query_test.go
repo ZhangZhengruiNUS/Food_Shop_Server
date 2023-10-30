@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-/* Test Product-count handle function */
+/* Test Product-count GET handle function */
 func TestProductCountHandler(t *testing.T) {
 	// Initiallize test data
 	productCountForFirstOwner := util.RandomInt64(10, 100)
@@ -109,7 +109,7 @@ func TestProductCountHandler(t *testing.T) {
 
 }
 
-/* Test Product-list handle function */
+/* Test Product-list GET handle function */
 func TestProductListHandler(t *testing.T) {
 	// Initiallize test data
 	productListForFirstOwner := creatRandomGetProductListRow(5)
@@ -240,4 +240,88 @@ func TestProductListHandler(t *testing.T) {
 
 	}
 
+}
+
+/* Test Product GET handle function */
+func TestProductHandler(t *testing.T) {
+	// Initiallize test data
+	products := creatRandomProducts(5)
+
+	// Initiallize test cases table
+	testCases := []struct {
+		name          string
+		url           string
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:       "ProductID is Empty for BadRequest",
+			url:        "/product?productId=",
+			buildStubs: func(store *mockdb.MockStore) {},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:       "ProductID is Empty for BadRequest",
+			url:        "/product?productId=abc",
+			buildStubs: func(store *mockdb.MockStore) {},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "ProductID is not Empty for InternalServerError",
+			url:  "/product?productId=1",
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetProduct(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(products[1], sql.ErrConnDone) //Mock database operations
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "ProductID is not Empty for OK",
+			url:  "/product?productId=1",
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetProduct(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(products[1], nil) //Mock database operations
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				product_map := structToGinH(products[1])
+				requireBodyMatch(t, recorder.Body, product_map)
+			},
+		},
+	}
+
+	// Loop each test cases
+	for i := range testCases {
+		testCase := testCases[i]
+
+		t.Run(testCase.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			store := mockdb.NewMockStore(ctrl)
+
+			// Build stubs
+			testCase.buildStubs(store)
+
+			// Start test server and request
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+			request, err := http.NewRequest(http.MethodGet, testCase.url, nil)
+			require.NoError(t, err)
+			server.router.ServeHTTP(recorder, request)
+
+			// Check response
+			testCase.checkResponse(t, recorder)
+		})
+
+	}
 }
