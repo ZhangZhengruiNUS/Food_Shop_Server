@@ -87,7 +87,7 @@ func ginHToIoReader(h gin.H) io.Reader {
 	return reader
 }
 
-// Generate random CreateProductParams
+// Generate random productAddRequest
 func createRandomProductAddRequest() productAddRequest {
 	return productAddRequest{
 		ShopOwnerName: util.RandomString(20),
@@ -111,5 +111,13 @@ func createProductByRequest(req productAddRequest) db.Product {
 		Quantity:      req.Quantity,
 		ExpireTime:    expireTime,
 		CreateTime:    time.Now(),
+	}
+}
+
+// Generate random productBuyRequest
+func createRandomProductBuyRequest() productBuyRequest {
+	return productBuyRequest{
+		ProductID: util.RandomInt64(1, 1000),
+		Quantity:  util.RandomInt32(10, 1000),
 	}
 }
