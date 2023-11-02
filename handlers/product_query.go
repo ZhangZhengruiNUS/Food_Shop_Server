@@ -52,7 +52,7 @@ func (server *Server) productListHandler(ctx *gin.Context) {
 	pageSizeStr := strings.TrimSpace(ctx.Query("pageSize"))
 	log.Println("userName=", userName)
 	log.Println("page=", pageStr)
-	log.Println("TEST pageSizeStr=", pageSizeStr)
+	log.Println("Demo pageSizeStr=", pageSizeStr)
 
 	//We need both of the page and the pageSize
 	if len(pageStr) == 0 || len(pageSizeStr) == 0 {
