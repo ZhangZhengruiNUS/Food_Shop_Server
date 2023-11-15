@@ -49,7 +49,7 @@ jobs:
 
   deply:
     needs: test
-    name: Build & Deploy image
+    name: Build & Deploy Image
     runs-on: ubuntu-latest
     permissions:
       id-token: write
