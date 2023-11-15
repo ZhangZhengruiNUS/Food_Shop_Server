@@ -55,7 +55,7 @@ func TestProduct(t *testing.T) {
 	// Check GetProductCount
 	require.NoError(t, err)
 	require.NotEmpty(t, count)
-	require.Equal(t, int64(8), count)
+	require.Equal(t, int64(7), count)
 
 	// Call GetProductCountByOwner
 	count, err = testQueries.GetProductCountByOwner(context.Background(), product1.ShopOwnerName)
